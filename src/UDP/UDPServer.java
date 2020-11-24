@@ -30,6 +30,7 @@ import willy.util.SerializationUtils;
 import willy.util.communitations.IP;
 import RSA.RSA;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
 
 /**
  *
@@ -67,16 +68,17 @@ public class UDPServer extends Ventana {
                     final UDPPacket receivedPacket = (UDPPacket) SerializationUtils.convertFromBytes(receivePacket.getData());
                     RSA r = new RSA(100);
                     r.generarD(receivedPacket.getE(), receivedPacket.getTotient());
-                    final String sentence = receivedPacket.getSenderName() + ": " + r.desencriptar(receivedPacket.getMsg(), receivedPacket.getN());
+                    final String decriptedmsg = r.desencriptar(receivedPacket.getMsg(), receivedPacket.getN());
+                    final String sentence = " (" + receivedPacket.getSenderName() + ") c:" + receivedPacket.getMsg() + " d:" + decriptedmsg;
 //                    final String sentence = new String(receivePacket.getData());
-                    texto.append("\n" + receivePacket.getAddress() + ":" + receivePacket.getPort() + " dice: " + sentence);
+                    texto.append("\n" + receivePacket.getAddress() + ":" + receivePacket.getPort() + sentence);
 
-                    final String capitalizedSentence = sentence.toUpperCase();
+                    final String returnSentence = receivedPacket.getSenderName() + ": " + decriptedmsg;
                     RSA re = new RSA(100);
-                    r.generarPrimos();
-                    r.generarClaves();
-                    final BigInteger[] cifreg = r.encriptar(capitalizedSentence);
-                    UDPPacket paenviar = new UDPPacket("Servidor", cifreg, r.n, r.totient, r.e);
+                    re.generarPrimos();
+                    re.generarClaves();
+                    final BigInteger[] cifreg = re.encriptar(returnSentence);
+                    UDPPacket paenviar = new UDPPacket("Servidor", cifreg, re.n, re.totient, re.e);
                     sendData = SerializationUtils.serialize(paenviar);
                     
                     for (int i = 0; i < clientAddressList.size(); i++) {
@@ -119,6 +121,7 @@ public class UDPServer extends Ventana {
         });
 
         this.serverSocket = new DatagramSocket(puerto);
+//        this.serverSocket.bind(new InetSocketAddress(IP.getPublicIP(), puerto));
         receiveData = new byte[8046];
         sendData = new byte[8046];
     }

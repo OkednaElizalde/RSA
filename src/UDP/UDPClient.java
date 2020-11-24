@@ -27,6 +27,7 @@ import willy.util.SerializationUtils;
 import willy.util.communitations.IP;
 import RSA.RSA;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,6 +87,8 @@ public class UDPClient extends Ventana {
         this.name = name;
         this.puerto = puerto;
 
+        this.clientSocket.bind(new InetSocketAddress(ip, puerto));
+        
         super.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
