@@ -131,7 +131,7 @@ public class UDPServer extends Ventana {
             final String pIp = IP.getPublicIP();
             JOptionPane.showMessageDialog(null, "Tu ip pública es: " + pIp, "IP pública", JOptionPane.INFORMATION_MESSAGE);
 
-            final UDPServer server = new UDPServer("Servidor", 200, 200, false, Integer.valueOf(puerto));
+            final UDPServer server = new UDPServer("Servidor", 200, 200, true, Integer.valueOf(puerto));
 
             final Thread t = new Thread(new Runnable() {
                 @Override

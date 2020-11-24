@@ -73,7 +73,7 @@ public class UDPClient extends Ventana {
         super(title, w, h, resizable);
         super.getContentPane().setLayout(null);
 
-        this.clientSocket = new DatagramSocket();
+        this.clientSocket = new DatagramSocket(puerto);
         this.IPAddress = InetAddress.getByName(ip);
         this.name = name;
         this.puerto = puerto;
@@ -88,22 +88,22 @@ public class UDPClient extends Ventana {
             }
         });
 
-        try {
-            final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);
-
-            final String modifiedSentence = new String(receiveData);
-            texto.append("\nRespuesta: " + modifiedSentence);
-            System.out.println("FROM SERVER: " + modifiedSentence);
-        } catch (IOException ex) {
-            if ("socket closed".equals(ex.getMessage())) {
-                listens = false;
-            } else {
-                System.err.println("Murió en la escucha unu " + ex.getMessage());
-            }
-        } finally {
-            receiveData = new byte[1024];
-        }
+//        try {
+//            final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+//            clientSocket.receive(receivePacket);
+//
+//            final String modifiedSentence = new String(receiveData);
+//            texto.append("\nRespuesta: " + modifiedSentence);
+//            System.out.println("FROM SERVER: " + modifiedSentence);
+//        } catch (IOException ex) {
+//            if ("socket closed".equals(ex.getMessage())) {
+//                listens = false;
+//            } else {
+//                System.err.println("Murió en la escucha unu " + ex.getMessage());
+//            }
+//        } finally {
+//            receiveData = new byte[1024];
+//        }
     }
 
     @Override
