@@ -28,6 +28,8 @@ import javax.swing.SwingUtilities;
 import willy.gui.Ventana;
 import willy.util.SerializationUtils;
 import willy.util.communitations.IP;
+import RSA.RSA;
+import java.math.BigInteger;
 
 /**
  *
@@ -63,12 +65,19 @@ public class UDPServer extends Ventana {
                     }
 
                     final UDPPacket receivedPacket = (UDPPacket) SerializationUtils.convertFromBytes(receivePacket.getData());
-                    final String sentence = receivedPacket.getSenderName() + ": " + receivedPacket.getMsg();
+                    RSA r = new RSA(100);
+                    r.generarD(receivedPacket.getE(), receivedPacket.getTotient());
+                    final String sentence = receivedPacket.getSenderName() + ": " + r.desencriptar(receivedPacket.getMsg(), receivedPacket.getN());
 //                    final String sentence = new String(receivePacket.getData());
                     texto.append("\n" + receivePacket.getAddress() + ":" + receivePacket.getPort() + " dice: " + sentence);
 
                     final String capitalizedSentence = sentence.toUpperCase();
-                    sendData = capitalizedSentence.getBytes();
+                    RSA re = new RSA(100);
+                    r.generarPrimos();
+                    r.generarClaves();
+                    final BigInteger[] cifreg = r.encriptar(capitalizedSentence);
+                    UDPPacket paenviar = new UDPPacket("Servidor", cifreg, r.n, r.totient, r.e);
+                    sendData = SerializationUtils.serialize(paenviar);
 
                     for (int i = 0; i < clientAddressList.size(); i++) {
                         final DatagramPacket sendPacket = new DatagramPacket(

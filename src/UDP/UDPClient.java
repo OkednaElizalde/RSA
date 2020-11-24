@@ -25,6 +25,10 @@ import javax.swing.SwingUtilities;
 import willy.gui.Ventana;
 import willy.util.SerializationUtils;
 import willy.util.communitations.IP;
+import RSA.RSA;
+import java.math.BigInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -52,8 +56,10 @@ public class UDPClient extends Ventana {
                 try {
                     final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                     clientSocket.receive(receivePacket);
-
-                    final String modifiedSentence = new String(receiveData);
+                    final UDPPacket receivedPacket = (UDPPacket) SerializationUtils.convertFromBytes(receivePacket.getData());
+                    RSA r = new RSA(100);
+                    r.generarD(receivedPacket.getE(), receivedPacket.getTotient());
+                    final String modifiedSentence = r.desencriptar(receivedPacket.getMsg(), receivedPacket.getN());
                     texto.append("\nRespuesta: " + modifiedSentence);
                     System.out.println("FROM SERVER: " + modifiedSentence);
                 } catch (IOException ex) {
@@ -62,6 +68,8 @@ public class UDPClient extends Ventana {
                     } else {
                         System.err.println("Murió en la escucha unu " + ex.getMessage());
                     }
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(UDPClient.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
                     receiveData = new byte[1024];
                 }
@@ -123,8 +131,13 @@ public class UDPClient extends Ventana {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    final String sentence = sendingText.getText();
-                    final UDPPacket udpp = new UDPPacket(name, sentence);
+                    RSA r = new RSA(100);
+                    r.generarPrimos();
+                    r.generarClaves();
+                    int men = Integer.parseInt(sendingText.getText());
+                    String elc = Integer.toString(men);
+                    final BigInteger[] sentence = r.encriptar(elc);
+                    final UDPPacket udpp = new UDPPacket(name, sentence, r.n, r.totient, r.e);
 
                     sendData = SerializationUtils.serialize(udpp);
 
@@ -132,6 +145,8 @@ public class UDPClient extends Ventana {
                     clientSocket.send(sendPacket);
                 } catch (IOException | NullPointerException ex) {
                     System.out.println("Something happeneden " + ex.getMessage());
+                } catch(NumberFormatException e){
+                    System.out.println("Solo números en el mensaje por favor");
                 } finally {
                     System.out.println("finally");
                     sendData = new byte[1024];

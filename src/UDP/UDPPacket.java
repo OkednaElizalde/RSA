@@ -6,6 +6,7 @@
 package UDP;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  *
@@ -14,19 +15,36 @@ import java.io.Serializable;
 public class UDPPacket implements Serializable{
     
     private final String senderName;
-    private final String msg;
+    private final BigInteger[] msg;
+    private final BigInteger n;
+    private final BigInteger totient;
+    private final BigInteger e;
     
-    public UDPPacket(String senderName, String msg) {
+    public UDPPacket(String senderName, BigInteger[] msg, BigInteger n, BigInteger totient, BigInteger e) {
         this.senderName = senderName;
         this.msg = msg;
+        this.n = n;
+        this.totient = totient;
+        this.e = e;
     }
 
     public String getSenderName() {
         return senderName;
     }
 
-    public String getMsg() {
+    public BigInteger[] getMsg() {
         return msg;
     }
     
+    public BigInteger getN(){
+        return n;
+    }
+    
+    public BigInteger getTotient(){
+        return totient;
+    }
+    
+    public BigInteger getE(){
+        return e;
+    }
 }
