@@ -42,8 +42,8 @@ public class UDPClient extends Ventana {
 
     private final DatagramSocket clientSocket;
     private final InetAddress IPAddress;
-    private byte[] sendData = new byte[1024];
-    private byte[] receiveData = new byte[1024];
+    private byte[] sendData = new byte[8046];
+    private byte[] receiveData = new byte[8046];
     private final String name;
     private final int puerto;
 
@@ -71,7 +71,7 @@ public class UDPClient extends Ventana {
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(UDPClient.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
-                    receiveData = new byte[1024];
+                    receiveData = new byte[8046];
                 }
             }
         }
@@ -110,7 +110,7 @@ public class UDPClient extends Ventana {
 //                System.err.println("Murió en la escucha unu " + ex.getMessage());
 //            }
 //        } finally {
-//            receiveData = new byte[1024];
+//            receiveData = new byte[8046];
 //        }
     }
 
@@ -149,7 +149,7 @@ public class UDPClient extends Ventana {
                     System.out.println("Solo números en el mensaje por favor");
                 } finally {
                     System.out.println("finally");
-                    sendData = new byte[1024];
+                    sendData = new byte[8046];
                 }
             }
         });

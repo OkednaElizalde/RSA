@@ -78,7 +78,7 @@ public class UDPServer extends Ventana {
                     final BigInteger[] cifreg = r.encriptar(capitalizedSentence);
                     UDPPacket paenviar = new UDPPacket("Servidor", cifreg, r.n, r.totient, r.e);
                     sendData = SerializationUtils.serialize(paenviar);
-
+                    
                     for (int i = 0; i < clientAddressList.size(); i++) {
                         final DatagramPacket sendPacket = new DatagramPacket(
                                 sendData,
@@ -97,8 +97,8 @@ public class UDPServer extends Ventana {
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
-                    receiveData = new byte[1024];
-                    sendData = new byte[1024];
+                    receiveData = new byte[8046];
+                    sendData = new byte[8046];
                 }
             }
         }
@@ -119,8 +119,8 @@ public class UDPServer extends Ventana {
         });
 
         this.serverSocket = new DatagramSocket(puerto);
-        receiveData = new byte[1024];
-        sendData = new byte[1024];
+        receiveData = new byte[8046];
+        sendData = new byte[8046];
     }
 
     @Override
