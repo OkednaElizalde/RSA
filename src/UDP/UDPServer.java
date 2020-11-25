@@ -71,7 +71,7 @@ public class UDPServer extends Ventana {
                     //Espera a recibir el paquete
                     final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                     serverSocket.receive(receivePacket);
-
+                    
                     //Consigue la dirección IP
                     final InetAddress IPAddress = receivePacket.getAddress();
                     final int port = receivePacket.getPort();
@@ -84,6 +84,7 @@ public class UDPServer extends Ventana {
                         case UDPPacket.REQUEST:
                             //Manda un msg al cliente de tipo Accept con los datos bonitos osi
                             sendMessage(IPAddress, port, new UDPAcceptPacket(rsa.e, rsa.n));
+                            texto.append("\nSolicitud de " + IPAddress.getCanonicalHostName());
                             break;
                         case UDPPacket.MSG:
                             //Aquí pasa el msg a las variables y eso osi osi (y a lo mejor manda el msg codificado con la llave privada uwu)
@@ -154,7 +155,7 @@ public class UDPServer extends Ventana {
                 + "\nphi:" + rsa.getPhi().toString()
                 + "\ne:  " + rsa.e.toString()
                 + "\nd:  " + rsa.getD().toString()
-                + "\nMensages de clientes:"
+                + "\nMensajes de clientes:"
         );
     }
 

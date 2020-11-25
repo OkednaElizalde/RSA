@@ -16,7 +16,7 @@ public class RSA {
     private final BigInteger d;
 
     public RSA(int tamPrimo) {
-        this.tamPrimo = tamPrimo;
+        this.tamPrimo = (BigInteger.TEN.pow(tamPrimo + 1)).subtract(BigInteger.ONE).toString(2).length() - 1;
 
         this.p = new BigInteger(this.tamPrimo, 10, new Random());
         BigInteger qt;
