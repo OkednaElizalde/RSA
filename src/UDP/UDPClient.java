@@ -5,6 +5,7 @@
  */
 package UDP;
 
+import RSA.InvalidMsgLength;
 import UDP.packets.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -111,11 +112,11 @@ public class UDPClient extends Ventana {
 
         final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
-
+        
         final UDPAcceptPacket receivedAccept = (UDPAcceptPacket) SerializationUtils.convertFromBytes(receiveData);
         this.e = receivedAccept.getE();
         this.n = receivedAccept.getN();
-
+        
         this.texto.append(
                 "\nConectado exitosamente"
                 + "\ne: " + this.e.toString()
@@ -141,24 +142,26 @@ public class UDPClient extends Ventana {
         enviar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-//                try {
-//                    int msg = Integer.parseInt(sendingText.getText());
-//                    String elc = Integer.toString(men);
-//                    final BigInteger[] sentence = r.encriptar(elc);
-//                    final UDPPacket udpp = new UDPPacket(name, sentence, r.n, r.totient, r.e);
-//
-//                    sendData = SerializationUtils.serialize(udpp);
-//
-//                    final DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, puerto);
-//                    clientSocket.send(sendPacket);
-//                } catch (IOException | NullPointerException ex) {
-//                    System.out.println("Something happeneden " + ex.getMessage());
-//                } catch(NumberFormatException e){
-//                    System.out.println("Solo números en el mensaje por favor");
-//                } finally {
-//                    System.out.println("finally");
-//                    sendData = new byte[8046];
-//                }
+                try {
+                    int msg = Integer.parseInt(sendingText.getText());
+                    String sn = Integer.toString(msg);
+                    BigInteger sen = new BigInteger(sn);
+                    RSA r = new RSA(10);
+                    final BigInteger sentence = r.encriptar(sen, e, n);
+                    final UDPMsgPacket udpp = new UDPMsgPacket(sentence);
+                    byte[] sendData = new byte[8046];
+                    sendData = SerializationUtils.serialize(udpp);
+                    final DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, puerto);
+                    clientSocket.send(sendPacket);
+                } catch (NullPointerException ex) {
+                    System.out.println("Something happeneden " + ex.getMessage());
+                } catch(NumberFormatException e){
+                    System.out.println("Solo números en el mensaje por favor");
+                } catch (InvalidMsgLength ex) {
+                    System.out.println("No se que sea este error"+ex.getMessage());
+                } catch (IOException ex) {
+                    System.out.println("Error en la entrada o salida"+ex.getMessage());
+                }
             }
         });
 
