@@ -69,11 +69,11 @@ public class UDPClient extends Ventana {
 
         final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
-
+        
         final UDPAcceptPacket receivedAccept = (UDPAcceptPacket) SerializationUtils.convertFromBytes(receiveData);
         this.e = receivedAccept.getE();
         this.n = receivedAccept.getN();
-
+        
         this.texto.append(
                 "\nConectado exitosamente"
                 + "\ne: " + this.e.toString()
