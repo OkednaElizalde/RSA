@@ -6,7 +6,6 @@
 package UDP;
 
 import UDP.packets.*;
-import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -15,8 +14,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -25,13 +22,11 @@ import willy.gui.Ventana;
 import willy.util.SerializationUtils;
 import willy.util.communitations.IP;
 import RSA.RSA;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigInteger;
 import java.util.Date;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -43,10 +38,8 @@ import javax.swing.SwingConstants;
  */
 public class UDPServer extends Ventana {
 
-    //Variable de codificación
     private final RSA rsa;
 
-    //Variables de GUI
     private final JTextArea texto = new JTextArea("Server iniciado en " + IP.getPublicIP());
     private final JLabel msgCL = new JLabel("Mensaje cifrado:");
     private final JTextField msgC = new JTextField("", SwingConstants.CENTER);
@@ -54,12 +47,9 @@ public class UDPServer extends Ventana {
     private final JTextField msgD = new JTextField("", SwingConstants.CENTER);
     private final JButton decriptButton = new JButton("Desencriptar");
 
-    //Variables de Comunicación
     private final DatagramSocket serverSocket;
     private byte[] receiveData;
-//    private byte[] sendData;
 
-    //Variables de escucha
     private boolean listens = true;
     private final Thread escuchar = new Thread(new Runnable() {
 
@@ -68,26 +58,21 @@ public class UDPServer extends Ventana {
             boolean isListening = true;
             while (isListening && listens) {
                 try {
-                    //Espera a recibir el paquete
                     final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                     serverSocket.receive(receivePacket);
-                    
-                    //Consigue la dirección IP
+
                     final InetAddress IPAddress = receivePacket.getAddress();
                     final int port = receivePacket.getPort();
 
-                    //Transforma el paquete
                     final Object receivedObj = SerializationUtils.convertFromBytes(receivePacket.getData());
                     final UDPPacket receivedPacket = (UDPPacket) receivedObj;
 
                     switch (receivedPacket.getType()) {
                         case UDPPacket.REQUEST:
-                            //Manda un msg al cliente de tipo Accept con los datos bonitos osi
                             sendMessage(IPAddress, port, new UDPAcceptPacket(rsa.e, rsa.n));
                             texto.append("\nSolicitud de " + IPAddress.getCanonicalHostName());
                             break;
                         case UDPPacket.MSG:
-                            //Aquí pasa el msg a las variables y eso osi osi (y a lo mejor manda el msg codificado con la llave privada uwu)
                             final UDPMsgPacket receivedMsg = (UDPMsgPacket) receivedObj;
                             final String msg = receivedMsg.getMsg().toString();
                             texto.append(
@@ -97,19 +82,7 @@ public class UDPServer extends Ventana {
                             msgC.setText(msg);
                             break;
                         default:
-                        //Se supone que no debería llegar ningún accept... pero por si acaso algo va aquí
                     }
-
-//                    final String decriptedmsg = r.desencriptar(receivedPacket.getMsg(), receivedPacket.getN());
-//                    final String sentence = " (" + receivedPacket.getSenderName() + ") c:" + receivedPacket.getMsg() + " d:" + decriptedmsg;
-//                    texto.append("\n" + receivePacket.getAddress() + ":" + receivePacket.getPort() + sentence);
-//                    final String returnSentence = receivedPacket.getSenderName() + ": " + decriptedmsg;
-//                    RSA re = new RSA(100);
-//                    re.generarPrimos();
-//                    re.generarClaves();
-//                    final BigInteger[] cifreg = re.encriptar(returnSentence);
-//                    UDPPacket paenviar = new UDPPacket("Servidor", cifreg, re.n, re.totient, re.e);
-//                    sendData = SerializationUtils.serialize(paenviar);
                 } catch (IOException ex) {
                     if ("socket closed".equals(ex.getMessage())) {
                         isListening = false;
@@ -117,12 +90,9 @@ public class UDPServer extends Ventana {
                         System.err.println("Something went wrong: " + ex.getMessage());
                     }
                 } catch (ClassNotFoundException ex) {
-                    //Aquí creo que es cuando intentamos parsear el objeto
                     JOptionPane.showMessageDialog(null, "El mensaje recibido no pudo ser convertido correctamente", "Error al parsear", WIDTH);
-                    //Aquí a lo mejor podríamos mandar un msg de que no llegó correctamente al cliente y hacer que lo mande de nuevo
                 } finally {
                     receiveData = new byte[8046];
-//                    sendData = new byte[8046];
                 }
             }
         }
@@ -144,7 +114,6 @@ public class UDPServer extends Ventana {
 
         this.serverSocket = new DatagramSocket(puerto);
         this.receiveData = new byte[8046];
-//        this.sendData = new byte[8046];
         this.rsa = new RSA(tamPrimo);
         this.texto.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         this.texto.append(
@@ -204,7 +173,7 @@ public class UDPServer extends Ventana {
             }
 
             String tamPrimo = JOptionPane.showInputDialog(null, "Ingrese el tamaño del primo", "Tamaño del primo", JOptionPane.PLAIN_MESSAGE);
-            while (!tamPrimo.matches("\\d{1,4}")) {
+            while (!tamPrimo.matches("\\d{1,3}")) {
                 tamPrimo = JOptionPane.showInputDialog(null, "Ingrese el tamaño del primo", "Tamaño del primo", JOptionPane.PLAIN_MESSAGE);
             }
 

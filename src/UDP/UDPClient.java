@@ -5,6 +5,7 @@
  */
 package UDP;
 
+import RSA.InvalidMsgLength;
 import UDP.packets.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,9 +30,6 @@ import willy.util.communitations.IP;
 import RSA.RSA;
 import java.awt.HeadlessException;
 import java.math.BigInteger;
-import java.net.InetSocketAddress;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -50,45 +48,6 @@ public class UDPClient extends Ventana {
     private byte[] receiveData = new byte[8046];
     private final int puerto;
 
-    private boolean listens = true;
-
-    //Si el cliente sólo recibe un paquete Accept, a lo mejor no es necesario hacer un hilo de escucha, a menos que quieras
-    // que reciba el msg cifrado con d, te lo dejo aquí por si acaso
-//    private final Thread escuchar = new Thread(new Runnable() {
-//        @Override
-//        public void run() {
-//            while (listens) {
-//                try {
-//                    final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-//                    clientSocket.receive(receivePacket);
-//
-//                    final Object receivedObj = SerializationUtils.convertFromBytes(receivePacket.getData());
-//                    final UDPPacket receivedPacket = (UDPPacket) receivedObj;
-//
-//                    switch (receivedPacket.getType()) {
-//                        case UDPPacket.ACCEPT:
-//
-//                            break;
-//                    }
-//                    RSA r = new RSA(100);
-//                    r.generarD(receivedPacket.getE(), receivedPacket.getTotient());
-//                    final String modifiedSentence = r.desencriptar(receivedPacket.getMsg(), receivedPacket.getN());
-//                    texto.append("\nRespuesta: " + modifiedSentence);
-//                } catch (IOException ex) {
-//                    if ("socket closed".equals(ex.getMessage())) {
-//                        listens = false;
-//                    } else {
-//                        System.err.println("Murió en la escucha unu " + ex.getMessage());
-//                    }
-//                } catch (ClassNotFoundException ex) {
-//                    Logger.getLogger(UDPClient.class.getName()).log(Level.SEVERE, null, ex);
-//                } finally {
-//                    System.out.println(clientSocket.getPort());
-//                    receiveData = new byte[8046];
-//                }
-//            }
-//        }
-//    });
     public UDPClient(String title, int w, int h, boolean resizable, String ip, int puerto) throws SocketException, UnknownHostException, IOException, ClassNotFoundException {
         super(title, w, h, resizable);
         super.getContentPane().setLayout(null);
@@ -102,7 +61,6 @@ public class UDPClient extends Ventana {
             public void windowClosing(WindowEvent e) {
                 System.out.println("closed");
                 clientSocket.close();
-                listens = false;
                 e.getWindow().dispose();
             }
         });
@@ -141,24 +99,21 @@ public class UDPClient extends Ventana {
         enviar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-//                try {
-//                    int msg = Integer.parseInt(sendingText.getText());
-//                    String elc = Integer.toString(men);
-//                    final BigInteger[] sentence = r.encriptar(elc);
-//                    final UDPPacket udpp = new UDPPacket(name, sentence, r.n, r.totient, r.e);
-//
-//                    sendData = SerializationUtils.serialize(udpp);
-//
-//                    final DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, puerto);
-//                    clientSocket.send(sendPacket);
-//                } catch (IOException | NullPointerException ex) {
-//                    System.out.println("Something happeneden " + ex.getMessage());
-//                } catch(NumberFormatException e){
-//                    System.out.println("Solo números en el mensaje por favor");
-//                } finally {
-//                    System.out.println("finally");
-//                    sendData = new byte[8046];
-//                }
+                try {
+                    final String msg = sendingText.getText();
+                    if (msg.matches("\\d{1,}")) {
+                        final BigInteger sentence = RSA.encriptar(new BigInteger(msg), e, n);
+
+                        final UDPMsgPacket udpp = new UDPMsgPacket(sentence);
+                        sendMessage(udpp);
+                    }
+                } catch (NullPointerException ex) {
+                    System.out.println("Something happened " + ex.getMessage());
+                } catch (InvalidMsgLength ex) {
+                    System.out.println(ex.getMessage());
+                } catch (IOException ex) {
+                    System.out.println("Error en la entrada o salida" + ex.getMessage());
+                }
             }
         });
 
@@ -193,7 +148,6 @@ public class UDPClient extends Ventana {
 
             SwingUtilities.invokeAndWait(t);
 
-//            cliente.escuchar.start();  
         } catch (HeadlessException
                 | IOException
                 | ClassNotFoundException
@@ -202,7 +156,6 @@ public class UDPClient extends Ventana {
                 | InvocationTargetException
                 | NullPointerException e) {
             System.err.println(e);
-            //Algo pashó, qué? Quien sabe xD
         }
     }
 }

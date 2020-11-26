@@ -2,7 +2,6 @@ package RSA;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.io.*;
 
 public class RSA {
 
@@ -16,7 +15,7 @@ public class RSA {
     private final BigInteger d;
 
     public RSA(int tamPrimo) {
-        this.tamPrimo = (BigInteger.TEN.pow(tamPrimo + 1)).subtract(BigInteger.ONE).toString(2).length() - 1;
+        this.tamPrimo = (BigInteger.TEN.pow(tamPrimo)).subtract(BigInteger.ONE).toString(2).length() - 1;
 
         this.p = new BigInteger(this.tamPrimo, 10, new Random());
         BigInteger qt;
@@ -39,49 +38,6 @@ public class RSA {
 
     }
 
-    /*
-    Cifrar con el numero e ya que "e" es la clave publica
-     */
-//    public BigInteger[] encriptar(String mensaje){
-//        //variables
-//        int i;
-//        byte[] temp = new byte[1];
-//        byte[] digitos = mensaje.getBytes();
-//        BigInteger[] bigdigitos = new BigInteger[digitos.length];
-//
-//        //lo primero que debemos hacer es correr el tamaño de bigdigitos
-//        for(i = 0; i<bigdigitos.length; i++){
-//            temp[0] = digitos[i];
-//            bigdigitos[i] = new BigInteger(temp);
-//        }
-//
-//        //vamos a cifrar
-//        BigInteger[] encriptado = new BigInteger[bigdigitos.length];
-//
-//        for(i = 0; i<bigdigitos.length; i++){
-//            encriptado[i] = bigdigitos[i].modPow(e,n);
-//        }
-//        return encriptado;
-//    }
-
-    /*
-    descifrar array de biginteger
-     */
-//    public String desencriptar(BigInteger[] encriptado, BigInteger n){
-//        BigInteger[] desencriptar = new BigInteger[encriptado.length];
-//
-//        for(int i = 0; i<desencriptar.length; i++){
-//            desencriptar[i] = encriptado[i].modPow(d, n);
-//        }
-//
-//        char[] charArray = new char[desencriptar.length];
-//
-//        for(int i = 0; i<charArray.length; i++){
-//            charArray[i] = (char)(desencriptar[i].intValue());
-//        }
-//
-//        return (new String(charArray));
-//    }
     public BigInteger encriptar(final BigInteger msg) throws InvalidMsgLength {
         if (msg.compareTo(n) > 0) {
             throw new InvalidMsgLength("El mensage no puede ser mayor al valor de n: "
